@@ -1,10 +1,11 @@
 package com.example.spring2.service;
 
+import com.example.spring2.constant.PerdefinedRole;
 import com.example.spring2.dto.reponse.UserResponse;
 import com.example.spring2.dto.request.UserCreationRequest;
 import com.example.spring2.dto.request.UserUpdateRequest;
 import com.example.spring2.entity.User;
-import com.example.spring2.enums.Role;
+import com.example.spring2.entity.Role;
 import com.example.spring2.exception.AppException;
 import com.example.spring2.exception.ErrorCode;
 import com.example.spring2.mapper.UserMapper;
@@ -42,8 +43,9 @@ public class UserService {
             throw new AppException(ErrorCode.USER_EXISTED);
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        HashSet<String> roles= new HashSet<>();
-        roles.add(Role.user.name());
+        HashSet<Role> roles= new HashSet<>();
+        roleRepository.findById(PerdefinedRole.USER_ROLE).ifPresent(roles::add);
+        user.setRoles(roles);
         return userMapper.toUserResponse(userRepository.save(user));
     }
     public UserResponse getmyinfo(){
